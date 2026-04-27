@@ -68,16 +68,26 @@ CREATE INDEX questions_pinned_upvotes ON questions (pinned DESC, upvotes DESC, c
 
 ## Build order (the 10-minute demo)
 
+**Work on the `live` branch.** Vercel is wired so every push to `live` triggers a production deploy on the default `.vercel.app` URL — the audience sees it appear in real time. `main` stays clean as the starter for cloners.
+
+```bash
+git checkout -b live   # first time
+# ...code...
+git push -u origin live
+```
+
+Then:
+
 1. Schema + migration (`lib/db/migrate.sql`)
 2. Zod schemas (`lib/schemas.ts`) — `QuestionInput`, `Question`
 3. POST `/api/questions` with rate limit + Zod
 4. Mobile-first submission form (`/`)
 5. GET `/api/questions` + Board UI with sticky form
 6. Vote endpoint + optimistic UI
-7. Admin Basic Auth + minimal UI
-8. AI clustering background job
-9. Deploy to Vercel
-10. QR points to deployed URL
+7. Admin Basic Auth + minimal UI (only if `ADMIN_PASSWORD` is set)
+8. AI clustering job (only if `AI_GATEWAY_API_KEY` is set)
+9. Push to `live` → Vercel deploys → URL is shown
+10. QR / verbal: audience hits the deployed URL
 
 ## Out of scope (intentionally)
 
