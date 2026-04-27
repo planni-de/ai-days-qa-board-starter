@@ -21,7 +21,7 @@ This is the **build spec**. The 8 skills in `.claude/skills/` drive *how* the bu
 - **Anonymous submissions allowed.** Optional name field.
 - **Rate limit by IP**: 5 submissions/minute, 30 upvotes/minute.
 - **Admin auth (optional)**: if `ADMIN_PASSWORD` is set in env, `/admin/*` is gated by Basic Auth and shows pin/answered/delete actions. If unset, no admin route is exposed and the board is read-only after submission.
-- **AI clustering (optional)**: if `AI_GATEWAY_API_KEY` is set, similar questions are grouped via Vercel AI Gateway (Claude Haiku). If unset, questions render flat ordered by upvotes — still works fine for short events.
+- **AI clustering (optional)**: similar questions grouped via Vercel AI Gateway (`anthropic/claude-haiku-4-5`). On Vercel, OIDC auth is automatic — no API key needed. If you want to run clustering locally too, set `AI_GATEWAY_API_KEY`. If you skip clustering altogether, questions render flat ordered by upvotes — still fine for short events.
 - One Postgres DB (Vercel Postgres). One Redis (Upstash) for rate limit. Both required.
 - Deploy: 1-click Vercel.
 
