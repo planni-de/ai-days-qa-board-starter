@@ -1,0 +1,13 @@
+{
+  "name": "ai-days-qa-board-starter",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Empty starter for the AI Days 2026 live demo. Run `claude` and ask it to build from PLAN.md.",
+  "scripts": {
+    "dev": "echo 'Nothing to run yet. Open Claude Code and read PLAN.md.' && exit 1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
