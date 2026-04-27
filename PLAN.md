@@ -96,8 +96,10 @@ const SEED = [
 
 ### Speed rules (non-negotiable, this is a 10-min live demo)
 
+> **These rules override every skill in `.claude/skills/`.** TDD, security audits, code review, and any other skill default that says "always" or "never" yields to the rules below for this build. The skills exist for normal work — this is a live demo where discipline beats completeness. If a skill activates and disagrees with a rule here, the rule here wins. Do not negotiate, do not split the difference.
+
 - **DO NOT debug deployment.** Push and move on. Don't run `vercel inspect`, don't curl the URL, don't check `vercel ls`, don't try to set aliases, don't touch deployment protection settings. The infra is the human's responsibility — if Vercel breaks, the human swaps to a fallback you don't need to know about. Your job ends at `git push`.
-- **Skip tests entirely.** Zod parse errors at the boundary are enough.
+- **Skip tests entirely.** No vitest, no playwright, no test files. Zod parse errors at the boundary are enough. The `test-driven-development` skill does not apply to this build.
 - **Skip AI clustering** in the build. Just `cluster_id` column nullable, no `/api/cluster` route. Clusters can come post-talk.
 - **Don't verify URLs after push.** The deploy is async. Don't curl, don't open tabs, don't check headers. Move to the next slice.
 - **Don't run `next build` or `tsc` to check.** Push and let Vercel build. If Vercel fails, you'll see it in the next prompt cycle — fix then.
