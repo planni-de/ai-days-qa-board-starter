@@ -92,26 +92,34 @@ const SEED = [
 
 ## Build order (the 10-minute demo)
 
-**Work on the `live` branch.** Vercel is wired so every push to `live` triggers a production deploy on the default `.vercel.app` URL — the audience sees it appear in real time. `main` stays clean as the starter for cloners.
+**Work on the `live` branch.** Every push to `live` triggers a production deploy. Don't verify the URL — push and trust the deploy. The fallback covers any failure invisibly.
 
-```bash
-git checkout -b live   # first time
-# ...code...
-git push -u origin live
-```
+### Speed rules (non-negotiable, this is a 10-min live demo)
 
-Then:
+- **DO NOT debug deployment.** Push and move on. Don't run `vercel inspect`, don't curl the URL, don't check `vercel ls`, don't try to set aliases, don't touch deployment protection settings. The infra is the human's responsibility — if Vercel breaks, the human swaps to a fallback you don't need to know about. Your job ends at `git push`.
+- **Skip tests entirely.** Zod parse errors at the boundary are enough.
+- **Skip AI clustering** in the build. Just `cluster_id` column nullable, no `/api/cluster` route. Clusters can come post-talk.
+- **Don't verify URLs after push.** The deploy is async. Don't curl, don't open tabs, don't check headers. Move to the next slice.
+- **Don't run `next build` or `tsc` to check.** Push and let Vercel build. If Vercel fails, you'll see it in the next prompt cycle — fix then.
+- **Don't add `vercel.json`** unless absolutely needed. Defaults work.
+- **No `npm install` decisions** — package.json deps are listed below, copy verbatim.
+- **No alias / domain / DNS work.** Pre-wired by the human.
 
-1. Schema + migration (`lib/db/migrate.sql`)
-2. Zod schemas (`lib/schemas.ts`) — `QuestionInput`, `Question`
-3. POST `/api/questions` with rate limit + Zod
-4. Mobile-first submission form (`/`) + theme toggle in layout (no-flash inline script)
-5. GET `/api/questions` + Board UI with sticky form
-6. Vote endpoint + optimistic UI
-7. Admin Basic Auth + minimal UI (only if `ADMIN_PASSWORD` is set), with **Seed** and **Clear-all** buttons
-8. AI clustering job (only if `AI_GATEWAY_API_KEY` is set, or running on Vercel via OIDC)
-9. Push to `live` → Vercel deploys → URL is shown
-10. QR / verbal: audience hits the deployed URL
+### Order
+
+1. `package.json` + `tsconfig.json` + `next.config.mjs` + `app/globals.css` (with theme + orbs CSS) — copy from this PLAN section "Boilerplate".
+2. `npm install` (one shot, in background while you write code).
+3. `lib/schemas.ts` (Zod) + `lib/db.ts` (auto-migrate on first call).
+4. `app/layout.tsx` + `<ThemeToggle>` + `<BrandMark>` components.
+5. `app/page.tsx` (submission form) + `app/api/questions/route.ts` (POST/GET with Zod).
+6. **First push to `live`.** Vercel deploys. Audience sees something at `<project>.vercel.app`.
+7. `app/board/page.tsx` (board with sticky form, polling every 5s, optimistic vote).
+8. `app/api/questions/[id]/vote/route.ts` (vote endpoint).
+9. **Second push.**
+10. Admin Basic Auth (`middleware.ts` + `app/admin/page.tsx`) with Seed and Clear-all buttons. Cluster accordion *if you have time*.
+11. **Final push.**
+
+If you hit T+8m and the first deploy isn't live, drop step 10 entirely.
 
 ## Out of scope (intentionally)
 
