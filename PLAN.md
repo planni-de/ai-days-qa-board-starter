@@ -8,8 +8,9 @@ This is the **build spec**. The 8 skills in `.claude/skills/` drive *how* the bu
 
 - **Submission page** (`/`): scan, type, submit. No account, no friction.
 - **Board** (`/board`): list of questions, sortable by upvotes, anyone can upvote (rate-limited per IP).
-- **Admin** (`/admin`): password-protected. Mark answered, pin, delete spam.
+- **Admin** (`/admin`): password-protected. Mark answered, pin, delete spam. Plus two helpers: a **Seed** button that inserts ten realistic demo questions (so the board isn't empty if no one submits), and a **Clear-all** button to wipe questions+clusters between events.
 - **AI clustering**: similar questions grouped, fewer duplicates on screen.
+- **Theme toggle**: a small floating button (top-right, ≥44px tap target) that flips between light and dark. Default is OS preference (`prefers-color-scheme`). Choice persists in `localStorage` under key `qa-theme`. Apply theme via `<html data-theme="light|dark">` and read it in an inline `<script>` placed in `<head>` *before* paint to avoid a flash of wrong theme.
 
 ## Constraints (non-negotiable)
 
@@ -18,9 +19,10 @@ This is the **build spec**. The 8 skills in `.claude/skills/` drive *how* the bu
   - No hover-only states.
   - Sticky submit input on `/board` so the form is always reachable.
   - Single-column layout below 640px. Two-column desktop only.
+- **Light + dark theme.** Both fully styled. Toggle button visible on every page.
 - **Anonymous submissions allowed.** Optional name field.
 - **Rate limit by IP**: 5 submissions/minute, 30 upvotes/minute.
-- **Admin auth (optional)**: if `ADMIN_PASSWORD` is set in env, `/admin/*` is gated by Basic Auth and shows pin/answered/delete actions. If unset, no admin route is exposed and the board is read-only after submission.
+- **Admin auth (optional)**: if `ADMIN_PASSWORD` is set in env, `/admin/*` is gated by Basic Auth and shows pin/answered/delete actions plus the Seed and Clear-all buttons. If unset, no admin route is exposed and the board is read-only after submission.
 - **AI clustering (optional)**: similar questions grouped via Vercel AI Gateway (`anthropic/claude-haiku-4-5`). On Vercel, OIDC auth is automatic — no API key needed. If you want to run clustering locally too, set `AI_GATEWAY_API_KEY`. If you skip clustering altogether, questions render flat ordered by upvotes — still fine for short events.
 - One Postgres DB (Vercel Postgres). One Redis (Upstash) for rate limit. Both required.
 - Deploy: 1-click Vercel.
@@ -64,7 +66,26 @@ CREATE INDEX questions_pinned_upvotes ON questions (pinned DESC, upvotes DESC, c
 - `POST /api/questions/:id/vote` — rate limit, increment upvotes.
 - `POST /api/admin/questions/:id` — Basic Auth, body `{ answered?, pinned? }`.
 - `DELETE /api/admin/questions/:id` — Basic Auth, soft-delete (set deleted_at).
+- `POST /api/admin/seed` — Basic Auth. Inserts the ten demo questions below if the table is empty (or always, your call).
+- `POST /api/admin/clear` — Basic Auth. Truncates `questions` + `clusters`. Use between rehearsal and the live talk.
 - `POST /api/cluster` — cron-only, runs clustering on un-clustered questions.
+
+## Demo seed questions (German, talk-relevant)
+
+```ts
+const SEED = [
+  { body: 'Wie testet ihr Skills, bevor ihr sie produktiv nutzt?', authorName: 'Lukas' },
+  { body: 'Was kostet euch Claude pro Monat im Schnitt?', authorName: null },
+  { body: 'Wie reviewt ihr zehn PRs am Tag, die von Agenten kommen?', authorName: 'Sandra' },
+  { body: 'Wann braucht es eine Skill statt eines Agents?', authorName: null },
+  { body: 'Welche Skill würdet ihr in einem Team von fünf Devs zuerst schreiben?', authorName: 'Marc' },
+  { body: 'Wie verhindert ihr, dass Agenten schneller Schrott bauen?', authorName: null },
+  { body: 'Funktioniert das auch mit Cursor statt Claude Code?', authorName: 'Anja' },
+  { body: 'Wie handhabt ihr die Sicherheit von API-Keys in Skills?', authorName: null },
+  { body: 'Was war euer schlimmster Bug, den ein Agent verursacht hat?', authorName: 'Tobi' },
+  { body: 'Wie überzeugt ihr das Management, dass das wirklich Output bringt?', authorName: null },
+]
+```
 
 ## Build order (the 10-minute demo)
 
@@ -81,11 +102,11 @@ Then:
 1. Schema + migration (`lib/db/migrate.sql`)
 2. Zod schemas (`lib/schemas.ts`) — `QuestionInput`, `Question`
 3. POST `/api/questions` with rate limit + Zod
-4. Mobile-first submission form (`/`)
+4. Mobile-first submission form (`/`) + theme toggle in layout (no-flash inline script)
 5. GET `/api/questions` + Board UI with sticky form
 6. Vote endpoint + optimistic UI
-7. Admin Basic Auth + minimal UI (only if `ADMIN_PASSWORD` is set)
-8. AI clustering job (only if `AI_GATEWAY_API_KEY` is set)
+7. Admin Basic Auth + minimal UI (only if `ADMIN_PASSWORD` is set), with **Seed** and **Clear-all** buttons
+8. AI clustering job (only if `AI_GATEWAY_API_KEY` is set, or running on Vercel via OIDC)
 9. Push to `live` → Vercel deploys → URL is shown
 10. QR / verbal: audience hits the deployed URL
 
