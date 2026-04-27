@@ -11,6 +11,9 @@ This is the **build spec**. The 8 skills in `.claude/skills/` drive *how* the bu
 - **Admin** (`/admin`): password-protected. Mark answered, pin, delete spam. Plus two helpers: a **Seed** button that inserts ten realistic demo questions (so the board isn't empty if no one submits), and a **Clear-all** button to wipe questions+clusters between events.
 - **AI clustering**: similar questions grouped, fewer duplicates on screen.
 - **Theme toggle**: a small floating button (top-right, ≥44px tap target) that flips between light and dark. Default is OS preference (`prefers-color-scheme`). Choice persists in `localStorage` under key `qa-theme`. Apply theme via `<html data-theme="light|dark">` and read it in an inline `<script>` placed in `<head>` *before* paint to avoid a flash of wrong theme.
+- **Brand mark**: planni logo fixed top-left, links to https://planni.de (opens in new tab). Two PNG variants are already in `public/`: `planni-logo-dark.png` (for dark theme) and `planni-logo-light.png` (for light theme). Swap them with the same `data-theme` / `prefers-color-scheme` rules used for the palette.
+- **Animated background**: two large blurred radial-gradient orbs in primary colors (`#0071e3` and `#5856d6`), drifting slowly via CSS `@keyframes` (~22s and ~28s, alternate). They sit behind the content (`z-index: -1`), are pinned with `position: fixed`, and respect `prefers-reduced-motion: reduce` (animation disabled). Lighter opacity in light mode.
+- **Footer**: `Mit Grüßen vom planni-Team.` — *planni-Team* is a link to https://planni.de.
 
 ## Constraints (non-negotiable)
 
