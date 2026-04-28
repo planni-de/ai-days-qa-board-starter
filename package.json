@@ -1,11 +1,29 @@
 {
   "name": "ai-days-qa-board-starter",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "description": "Empty starter for the AI Days 2026 live demo. Run `claude` and ask it to build from PLAN.md.",
   "scripts": {
-    "dev": "echo 'Nothing to run yet. Open Claude Code and read PLAN.md.' && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.37.0",
+    "@vercel/postgres": "^0.10.0",
+    "next": "16.2.4",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^5.9.3"
   },
   "engines": {
     "node": ">=20"
